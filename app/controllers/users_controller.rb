@@ -7,7 +7,7 @@ class UsersController < ApplicationController
            union all select second_user_id from dislikes where first_user_id = ?
            union all select ?) limit 50;'
     users = User.find_by_sql([sql, id, id, id])
-    render json: users
+    render json: users, each_serializer: UsersSerializer
   end
 
   private
