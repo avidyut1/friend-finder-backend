@@ -26,6 +26,10 @@ class UsersController < ApplicationController
     u.sex = sign_up_params[:sex]
     u.email = sign_up_params[:email]
     u.password = sign_up_params[:password]
+    if sign_up_params[:password].nil?
+      render json: {message: 'sign_up failed', reason: 'missing data'}
+      return
+    end
     if u.save
       jwt = generate_jwt(u)
       render json: {token: jwt, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email}

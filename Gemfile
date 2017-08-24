@@ -60,3 +60,5 @@ gem 'carrierwave', '~> 1.0'
 gem 'jwt'
 
 gem 'figaro'
+
+gem 'rack-cors', :require => 'rack/cors'
