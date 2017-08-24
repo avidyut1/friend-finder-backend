@@ -39,9 +39,9 @@ ActiveRecord::Schema.define(version: 20170823161253) do
     t.string "name"
     t.string "email"
     t.string "password_digest"
-    t.string "profile_picture"
     t.integer "age"
     t.string "sex"
+    t.string "avatar"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

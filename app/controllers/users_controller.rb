@@ -17,8 +17,55 @@ class UsersController < ApplicationController
     end
   end
 
+  def sign_up
+    sign_up_params = sign_up_params(params)
+    u = User.new
+    u.avatar = sign_up_params[:avatar]
+    u.name = sign_up_params[:name]
+    u.age = sign_up_params[:age]
+    u.sex = sign_up_params[:sex]
+    u.email = sign_up_params[:email]
+    u.password = sign_up_params[:password]
+    if u.save
+      jwt = generate_jwt(u)
+      render json: {token: jwt, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email}
+    else
+      render json: {message: 'sign_up failed'}
+    end
+  end
+
+  def login
+    login_params = login_params(params)
+    email = login_params[:email]
+    password = login_params[:password]
+    u = User.find_by_email(email)
+    if u && u.authenticate(password)
+      jwt = generate_jwt(u)
+      render json: {token: jwt, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email}
+    else
+      render json: {message: 'login failed'};
+    end
+  end
+
   private
+  def generate_jwt(u)
+    data = u.as_json
+    data.delete('password_digest')
+    exp = Time.now.to_i + 4 * 3600 * 24 * 365
+    exp_payload = { :data => data, :exp => exp }
+    puts Figaro.env.hmac_secret
+    JWT.encode exp_payload, Figaro.env.hmac_secret, 'HS256'
+  end
+
   def fetch_params(params)
     params.permit(:id)
+  end
+
+  def sign_up_params(params)
+    params.permit(:name, :age, :sex, :avatar, :email, :password)
+  end
+
+  def login_params(params)
+    params.permit(:email, :password)
   end
 end
