@@ -51,7 +51,7 @@ class UsersController < ApplicationController
   def generate_jwt(u)
     data = u.as_json
     data.delete('password_digest')
-    exp = Time.now.to_i + 4 * 3600 * 24 * 365
+    exp = Time.now.to_i + 3600 * 24 * 365
     exp_payload = { :data => data, :exp => exp }
     puts Figaro.env.hmac_secret
     JWT.encode exp_payload, Figaro.env.hmac_secret, 'HS256'
