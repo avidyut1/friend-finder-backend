@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 20170823161253) do
 
-  create_table "dislikes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "dislikes", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "first_user_id"
     t.integer "second_user_id"
     t.datetime "created_at", null: false
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 20170823161253) do
     t.string "password_digest"
     t.string "profile_picture"
     t.integer "age"
+    t.string "sex"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
