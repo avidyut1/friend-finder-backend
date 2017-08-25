@@ -20,7 +20,6 @@ class UsersController < ApplicationController
   def sign_up
     sign_up_params = sign_up_params(params)
     u = User.new
-    u.avatar = sign_up_params[:avatar]
     u.name = sign_up_params[:name]
     u.age = sign_up_params[:age]
     u.sex = sign_up_params[:sex]
@@ -31,8 +30,9 @@ class UsersController < ApplicationController
       return
     end
     if u.save
+      puts u.avatar_url
       jwt = generate_jwt(u)
-      render json: {token: jwt, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email}
+      render json: {token: jwt, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email, id: u.id}
     else
       render json: {message: 'sign_up failed'}
     end
@@ -51,6 +51,20 @@ class UsersController < ApplicationController
     end
   end
 
+  def upload_avatar
+    u = User.find_by_id(params[:id])
+    if u
+      u.avatar = params[:file]
+      if u.save
+        render json: {message: 'success', url: u.avatar.url}
+      else
+        render json: {message: 'error saving file'}
+      end
+    else
+      render json: {message: 'user with id does not exists'}
+    end
+  end
+
   private
   def generate_jwt(u)
     data = u.as_json
@@ -66,7 +80,7 @@ class UsersController < ApplicationController
   end
 
   def sign_up_params(params)
-    params.permit(:name, :age, :sex, :avatar, :email, :password)
+    params.permit(:name, :age, :sex, :email, :password)
   end
 
   def login_params(params)
