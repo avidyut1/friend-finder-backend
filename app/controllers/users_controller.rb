@@ -2,15 +2,14 @@ class UsersController < ApplicationController
 
   def fetch
     user = get_user_from_token
-    user = User.find_by_id(user['id'])
     if user
-      id = user.id
+      id = user['id']
       sql = 'select * from users where id not in
           (select second_user_id from likes where first_user_id = ?
            union all select second_user_id from dislikes where first_user_id = ?
            union all select ?)
           and sex <> ? limit 50;'
-      users = User.find_by_sql([sql, id, id, id, user.sex])
+      users = User.find_by_sql([sql, id, id, id, user['sex']])
       render json: users, each_serializer: UsersSerializer
     else
       render json: {message: 'no_user_found'}
