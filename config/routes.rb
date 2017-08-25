@@ -4,5 +4,7 @@ Rails.application.routes.draw do
   get 'users/fetch'
   post 'users' => 'users#sign_up'
   post 'users/:id/uploadavatar' => 'users#upload_avatar'
+  get 'users' => 'users#index'
+  get 'users/:id' => 'users#get'
   post 'users/login'
 end

@@ -16,6 +16,11 @@ class UsersController < ApplicationController
     end
   end
 
+  def index
+    user = get_user_from_token
+    render json: user
+  end
+
   def sign_up
     sign_up_params = sign_up_params(params)
     u = User.new
@@ -24,17 +29,27 @@ class UsersController < ApplicationController
     u.sex = sign_up_params[:sex]
     u.email = sign_up_params[:email]
     u.password = sign_up_params[:password]
-    if sign_up_params[:password].nil?
-      render json: {message: 'sign_up failed', reason: 'missing data'}
+    if sign_up_params[:password].nil? || sign_up_params[:name].nil? || sign_up_params[:age].nil? || sign_up_params[:sex].nil? || sign_up_params[:email].nil?
+      render json: {message: 'sign_up failed', reason: 'missing required values'}
+      return
+    end
+    prev_user = User.find_by_email(sign_up_params[:email])
+    if prev_user
+      render json: {message: 'sign_up failed', reason: 'email already registered'}
       return
     end
     if u.save
       puts u.avatar_url
       jwt = generate_jwt(u)
-      render json: {token: jwt, name: u.name, age: u.age, sex: u.sex, email: u.email, id: u.id}
+      render json: {message: 'success', id: u.id}
     else
       render json: {message: 'sign_up failed'}
     end
+  end
+
+  def get
+    u = User.find_by_id(params[:id])
+    render json: u
   end
 
   def login
@@ -44,7 +59,7 @@ class UsersController < ApplicationController
     u = User.find_by_email(email)
     if u && u.authenticate(password)
       jwt = generate_jwt(u)
-      render json: {token: jwt, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email}
+      render json: {token: jwt, id: u.id, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email}
     else
       render json: {message: 'login failed'};
     end
