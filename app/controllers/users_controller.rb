@@ -1,10 +1,10 @@
 class UsersController < ApplicationController
 
   def fetch
-    id = fetch_params(params)[:id]
-    #TODO get user from jwt
-    user = User.find_by_id(id)
+    user = get_user_from_token
+    user = User.find_by_id(user['id'])
     if user
+      id = user.id
       sql = 'select * from users where id not in
           (select second_user_id from likes where first_user_id = ?
            union all select second_user_id from dislikes where first_user_id = ?
@@ -71,7 +71,6 @@ class UsersController < ApplicationController
     data.delete('password_digest')
     exp = Time.now.to_i + 3600 * 24 * 365
     exp_payload = { :data => data, :exp => exp }
-    puts Figaro.env.hmac_secret
     JWT.encode exp_payload, Figaro.env.hmac_secret, 'HS256'
   end
 
