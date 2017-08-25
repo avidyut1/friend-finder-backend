@@ -32,7 +32,7 @@ class UsersController < ApplicationController
     if u.save
       puts u.avatar_url
       jwt = generate_jwt(u)
-      render json: {token: jwt, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email, id: u.id}
+      render json: {token: jwt, name: u.name, age: u.age, sex: u.sex, email: u.email, id: u.id}
     else
       render json: {message: 'sign_up failed'}
     end
