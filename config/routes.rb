@@ -7,4 +7,5 @@ Rails.application.routes.draw do
   get 'users' => 'users#index'
   get 'users/:id' => 'users#get'
   post 'users/login'
+  post 'users/batch' => 'users#batch'
 end

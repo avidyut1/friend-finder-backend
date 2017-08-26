@@ -52,6 +52,30 @@ class UsersController < ApplicationController
     render json: u
   end
 
+  def batch
+    batch_params = batch_params(params)
+    likes = batch_params[:likes]
+    dislikes = batch_params[:dislikes]
+    user = get_user_from_token
+    if user
+      likes.each do |like_id|
+        like = Like.new
+        like.first_user_id = user['id']
+        like.second_user_id = like_id
+        like.save
+      end
+      dislikes.each do |dislike_id|
+        dislike = Dislike.new
+        dislike.first_user_id = user['id']
+        dislike.second_user_id = dislike_id
+        dislike.save
+      end
+      render json: {message: 'success'}
+    else
+      render json: {message: 'no_user_found'}
+    end
+  end
+
   def login
     login_params = login_params(params)
     email = login_params[:email]
@@ -99,4 +123,9 @@ class UsersController < ApplicationController
   def login_params(params)
     params.permit(:email, :password)
   end
+
+  def batch_params(params)
+    params.permit(:likes => [], :dislikes => [])
+  end
+
 end
