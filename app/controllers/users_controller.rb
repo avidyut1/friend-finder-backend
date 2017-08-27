@@ -93,6 +93,23 @@ class UsersController < ApplicationController
     end
   end
 
+  def match
+    user = get_user_from_token
+    matches = Match.where(:first_user_id => user['id'])
+    puts matches.pluck(:second_user_id)
+    users = User.where('id in (?)', matches.pluck(:second_user_id))
+    render json: users, each_serializer: UsersSerializer
+  end
+
+  def match_after
+    after_id = params[:id]
+    user = get_user_from_token
+    matches = Match.where(:first_user_id => user['id'])
+    puts matches.pluck(:second_user_id)
+    users = User.where('id in (?) and id > ?', matches.pluck(:second_user_id), after_id)
+    render json: users, each_serializer: UsersSerializer
+  end
+
   private
 
   def save_likes(likes, user)

@@ -8,4 +8,6 @@ Rails.application.routes.draw do
   get 'users/:id' => 'users#get'
   post 'users/login'
   post 'users/batch' => 'users#batch'
+  get 'matches' => 'users#match'
+  get 'matches/:id' => 'users#match_after'
 end
