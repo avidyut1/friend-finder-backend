@@ -58,18 +58,8 @@ class UsersController < ApplicationController
     dislikes = batch_params[:dislikes]
     user = get_user_from_token
     if user
-      likes.each do |like_id|
-        like = Like.new
-        like.first_user_id = user['id']
-        like.second_user_id = like_id
-        like.save
-      end
-      dislikes.each do |dislike_id|
-        dislike = Dislike.new
-        dislike.first_user_id = user['id']
-        dislike.second_user_id = dislike_id
-        dislike.save
-      end
+      save_likes(likes, user)
+      save_dislikes(dislikes, user)
       render json: {message: 'success'}
     else
       render json: {message: 'no_user_found'}
@@ -83,7 +73,7 @@ class UsersController < ApplicationController
     u = User.find_by_email(email)
     if u && u.authenticate(password)
       jwt = generate_jwt(u)
-      render json: {token: jwt, id: u.id, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email}
+      render json: {message: 'success', token: jwt, id: u.id, name: u.name, age: u.age, avatar: u.avatar.url, sex: u.sex, email: u.email}
     else
       render json: {message: 'login failed'};
     end
@@ -104,6 +94,37 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def save_likes(likes, user)
+    likes.each do |like_id|
+      like = Like.new
+      like.first_user_id = user['id']
+      like.second_user_id = like_id
+      like.save
+      #creating match if its a match
+      reverse_like = Like.where(:first_user_id => like_id, :second_user_id => user['id']).first
+      if reverse_like
+        match = Match.new
+        match.first_user_id = like_id
+        match.second_user_id = user['id']
+        match.save
+        reverse_match = Match.new
+        reverse_match.first_user_id = user['id']
+        reverse_match.second_user_id = like_id
+        reverse_match.save
+      end
+    end
+  end
+
+  def save_dislikes(dislikes, user)
+    dislikes.each do |dislike_id|
+      dislike = Dislike.new
+      dislike.first_user_id = user['id']
+      dislike.second_user_id = dislike_id
+      dislike.save
+    end
+  end
+
   def generate_jwt(u)
     data = u.as_json
     data.delete('password_digest')
