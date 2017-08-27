@@ -40,7 +40,6 @@ class UsersController < ApplicationController
     end
     if u.save
       puts u.avatar_url
-      jwt = generate_jwt(u)
       render json: {message: 'success', id: u.id}
     else
       render json: {message: 'sign_up failed'}
@@ -95,19 +94,27 @@ class UsersController < ApplicationController
 
   def match
     user = get_user_from_token
-    matches = Match.where(:first_user_id => user['id'])
-    puts matches.pluck(:second_user_id)
-    users = User.where('id in (?)', matches.pluck(:second_user_id))
-    render json: users, each_serializer: UsersSerializer
+    if user
+      matches = Match.where(:first_user_id => user['id'])
+      puts matches.pluck(:second_user_id)
+      users = User.where('id in (?)', matches.pluck(:second_user_id))
+      render json: users, each_serializer: UsersSerializer
+    else
+      render json: {message: 'no_user_found'}
+    end
   end
 
   def match_after
     after_id = params[:id]
     user = get_user_from_token
-    matches = Match.where(:first_user_id => user['id'])
-    puts matches.pluck(:second_user_id)
-    users = User.where('id in (?) and id > ?', matches.pluck(:second_user_id), after_id)
-    render json: users, each_serializer: UsersSerializer
+    if user
+      matches = Match.where(:first_user_id => user['id'])
+      puts matches.pluck(:second_user_id)
+      users = User.where('id in (?) and id > ?', matches.pluck(:second_user_id), after_id)
+      render json: users, each_serializer: UsersSerializer
+    else
+      render json: {message: 'no_user_found'}
+    end
   end
 
   private
