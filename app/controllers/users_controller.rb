@@ -29,6 +29,7 @@ class UsersController < ApplicationController
     u.sex = sign_up_params[:sex]
     u.email = sign_up_params[:email]
     u.password = sign_up_params[:password]
+    u.mobile = sign_up_params[:mobile]
     if sign_up_params[:password].nil? || sign_up_params[:name].nil? || sign_up_params[:age].nil? || sign_up_params[:sex].nil? || sign_up_params[:email].nil?
       render json: {message: 'sign_up failed', reason: 'missing required values'}
       return
@@ -162,7 +163,7 @@ class UsersController < ApplicationController
   end
 
   def sign_up_params(params)
-    params.permit(:name, :age, :sex, :email, :password)
+    params.permit(:name, :age, :sex, :email, :password, :mobile)
   end
 
   def login_params(params)

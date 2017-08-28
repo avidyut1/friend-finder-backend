@@ -7,6 +7,7 @@ class CreateUsers < ActiveRecord::Migration[5.1]
       t.column :age, :integer
       t.column :sex, :string
       t.column :avatar, :string
+      t.column :mobile, :string
       t.timestamps
     end
   end

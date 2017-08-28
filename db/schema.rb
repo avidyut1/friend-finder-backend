@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 20170823161253) do
     t.integer "age"
     t.string "sex"
     t.string "avatar"
+    t.string "mobile"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
